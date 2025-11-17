@@ -1,0 +1,15 @@
+streamlit==1.23.1
+pandas
+numpy
+scikit-learn
+lightgbm
+joblib
+shap
+matplotlib
+plotly
+sentence-transformers
+torch
+librosa
+soundfile
+reportlab
+pytest
