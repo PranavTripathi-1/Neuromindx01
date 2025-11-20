@@ -29,9 +29,12 @@ mental-health patterns.
 """)
 
 # Auto-detect Streamlit page files:
-st.sidebar.page_link("pages/1_🧠_Assessments.py", label="🧠 Assessments")
-st.sidebar.page_link("pages/2_📊_Dashboard.py", label="📊 Dashboard")
-st.sidebar.page_link("pages/3_🤖_Model_Predictions.py", label="🤖 Model Predictions")
+if st.sidebar.button("🧠 Assessments"):
+    st.switch_page("pages/1_🧠_Assessments.py")
+if st.sidebar.button("📊 Dashboard"):
+    st.switch_page("pages/2_📊_Dashboard.py")
+if st.sidebar.button("🤖 Model Predictions"):
+    st.switch_page("pages/3_🤖_Model_Predictions.py")
 # st.sidebar.page_link("pages/4_⚙️_Admin_Controls.py", label="⚙️ Admin Controls")
 
 st.sidebar.markdown("---")
