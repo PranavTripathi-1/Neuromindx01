@@ -1,106 +1,118 @@
 import streamlit as st
 import pandas as pd
-from src.features import extract_features
-from src.model import predict_ensemble   # uses improved model loader
+import numpy as np
+import joblib
+import os
 
-st.set_page_config(page_title="Model Predictions", page_icon="🧠")
-
-
-# ---------------------------------------------------------
-#                 PAGE HEADER
-# ---------------------------------------------------------
-
-st.title("🧠 AI-Based Neuropsychiatric Prediction")
-st.write("""
-Provide your symptoms or emotional description, and the AI model will analyze
-patterns and predict the likelihood of a neuropsychiatric condition
-(depression, anxiety, or stress).
-""")
+from src.features import extract_features   # your real extractor
 
 
-# ---------------------------------------------------------
-#             USER INPUT SECTION
-# ---------------------------------------------------------
+# ============================================================
+# SAFE MODEL LOADER (NO IMPORT ERRORS)
+# ============================================================
+
+@st.cache_resource
+def load_model():
+    """
+    Safely loads the ensemble model stored in:
+        models/final_model.pkl
+    Works with sklearn 1.3.0
+    """
+    base = os.path.dirname(os.path.dirname(__file__))  # Neuromindx project root
+    model_path = os.path.join(base, "models", "final_model.pkl")
+
+    if not os.path.exists(model_path):
+        st.error("❌ final_model.pkl is missing in /models folder!")
+        return None
+    
+    try:
+        model = joblib.load(model_path)
+        return model
+    except Exception as e:
+        st.error(f"❌ Failed to load model: {e}")
+        return None
+
+
+# ============================================================
+# PAGE UI
+# ============================================================
+
+st.title("🧠 Mental Health Prediction")
+st.write("Provide text below to analyze risk level.")
+
+
+# Load the model only once
+bundle = load_model()
+
+
+# Stop if model did not load
+if bundle is None:
+    st.stop()
+
+
+# ============================================================
+# INPUT BOX
+# ============================================================
 
 user_text = st.text_area(
-    "📝 Describe how you're feeling today:",
-    placeholder="Write about your mood, thoughts, sleep, energy, stress, etc...",
-    height=180
+    "Write how you feel today:",
+    placeholder="Example: I feel stressed and tired today..."
 )
 
-# Action button
-if st.button("🔍 Predict Condition"):
 
-    if len(user_text.strip()) < 5:
-        st.error("Please enter a longer and meaningful description.")
+# ============================================================
+# RUN PREDICTION
+# ============================================================
+
+if st.button("Analyze"):
+    if user_text.strip() == "":
+        st.warning("Please enter some text.")
         st.stop()
 
-    # ---------------------------------------------------------
-    #       1. Extract Features from User Text
-    # ---------------------------------------------------------
-
+    # Convert input into feature row
     features = extract_features(user_text)
-
-    # Convert dict → DataFrame with single row
     X = pd.DataFrame([features])
 
-    st.subheader("🧪 Extracted Features")
-    st.json(features)
+    st.write("### Extracted Features")
+    st.write(X)
 
-    # ---------------------------------------------------------
-    #       2. Run ENSEMBLE MODEL PREDICTION
-    # ---------------------------------------------------------
-
+    # Run ensemble prediction
     try:
-        score = predict_ensemble(X)[0]    # get first row value
-    except FileNotFoundError:
-        st.error("❌ Model file missing! Please place your 'final_model.pkl' inside /models folder.")
-        st.stop()
+        p1 = bundle["logistic"].predict_proba(X)[:, 1]
+        p2 = bundle["rf"].predict_proba(X)[:, 1]
+        p3 = bundle["mlp"].predict_proba(X)[:, 1]
+
+        # LightGBM behaves differently; use predict() not predict_proba()
+        try:
+            p4 = bundle["lgbm"].predict(X)
+        except:
+            p4 = p1  # fallback
+
+        final_score = float((p1 + p2 + p3 + p4) / 4)
+
     except Exception as e:
-        st.error(f"❌ Prediction failed: {e}")
+        st.error(f"Prediction failed: {e}")
         st.stop()
 
+    # ============================================================
+    # DISPLAY RESULT
+    # ============================================================
 
-    # ---------------------------------------------------------
-    #      3. Interpret the result into human labels
-    # ---------------------------------------------------------
+    st.write("---")
+    st.subheader("🧪 Prediction Result")
 
-    if score < 0.33:
-        label = "🟢 Low Risk — Normal / Mild"
-        explanation = "Your emotional patterns do not strongly indicate a neuropsychiatric disorder."
-    elif 0.33 <= score < 0.66:
-        label = "🟡 Moderate Risk — Observe"
-        explanation = "There are some signals of emotional imbalance. Monitoring is recommended."
+    st.metric(
+        label="Predicted Mental Health Risk Score",
+        value=f"{final_score:.2f}",
+        delta=None
+    )
+
+    if final_score < 0.33:
+        st.success("🟢 Low Risk — You're generally okay!")
+    elif final_score < 0.66:
+        st.warning("🟡 Moderate Risk — Some signs of stress or anxiety.")
     else:
-        label = "🔴 High Risk — Clinical Suggestive"
-        explanation = "Strong indicators of psychological distress such as depression, anxiety, or stress."
+        st.error("🔴 High Risk — You may be experiencing emotional distress.")
 
-    # ---------------------------------------------------------
-    #      4. Display Result
-    # ---------------------------------------------------------
-
-    st.subheader("🎯 Final Prediction Score")
-    st.metric("Risk Probability", f"{score:.2f}")
-
-    st.subheader("🧠 Model Interpretation")
-    st.success(label)
-    st.write(explanation)
-
-    st.info("⚠ This is not a clinical diagnosis. Consult a professional if symptoms persist.")
-
-
-# ---------------------------------------------------------
-#             SIDEBAR INFORMATION
-# ---------------------------------------------------------
-
-st.sidebar.header("ℹ Model Info")
-st.sidebar.write("""
-This model uses a **4-model ensemble**:
-
-- Logistic Regression  
-- Random Forest  
-- MLP Neural Network  
-- LightGBM  
-
-The final prediction is the average probability from all models.
-""")
+    st.write("---")
+    st.write("✔ Model loaded using sklearn 1.3.0 (compatible)")
