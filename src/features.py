@@ -90,3 +90,11 @@ def build_feature_dataframe(df, tfidf_vect=None, fit_tfidf=False):
                       emb_df.reset_index(drop=True), audio_df.reset_index(drop=True)], axis=1)
     feat.fillna(0, inplace=True)
     return feat, vect
+def extract_features(text):
+    # Example: Convert text into simple numeric features
+    features = {
+        "length": len(text),
+        "num_words": len(text.split()),
+        "avg_word_length": sum(len(w) for w in text.split()) / (len(text.split()) or 1)
+    }
+    return features

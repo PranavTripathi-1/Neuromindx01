@@ -1,0 +1,2 @@
+user_id,assessment_type,score,created_at,id,timestamp,phq9,phq9_item9,gad7,mdq_symptoms,mdq_positive,pqb,mem_score,vf_score,clock_score,taps,summary
+,,,,d34d57f3-f4b3-4c58-a1be-f3f05f5a1598,2025-11-20T16:34:33.458054,0.0,0.0,0.0,1.0,False,0.0,0.0,0.0,2.0,0.0,Cognitive impairment:Mild Concerns;Motor/parkinsonism:Bradykinesia-like (low taps) — consider evaluation for parkinsonism
