@@ -5,7 +5,7 @@ import os
 
 # ---------------------- PAGE CONFIG ----------------------
 st.set_page_config(
-    page_title="Neuropsy Early Screening App",
+    page_title="ATHENANET:Neuropsy Early Screening App",
     page_icon="🧠",
     layout="wide",
 )
