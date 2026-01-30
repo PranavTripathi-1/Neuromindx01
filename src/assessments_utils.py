@@ -119,6 +119,7 @@ def memory_recall():
     import time
     import random
     import streamlit as st
+    from streamlit_autorefresh import st_autorefresh
 
     st.subheader("🧠 Memory — Immediate Recall")
 
@@ -128,60 +129,54 @@ def memory_recall():
         "train", "stone", "flower", "coffee", "planet"
     ]
 
-    # -------- Session State Init --------
+    # -------- INIT STATE --------
     if "words" not in st.session_state:
         st.session_state.words = []
-
-    if "showing_words" not in st.session_state:
-        st.session_state.showing_words = False
 
     if "start_time" not in st.session_state:
         st.session_state.start_time = None
 
-    if "test_done" not in st.session_state:
-        st.session_state.test_done = False
+    if "phase" not in st.session_state:
+        st.session_state.phase = "idle"  # idle | show | recall
 
     placeholder = st.empty()
 
-    # -------- Start Test --------
+    # -------- START BUTTON --------
     if st.button("👀 Show words (6s)"):
         st.session_state.words = random.sample(WORD_POOL, 5)
-        st.session_state.showing_words = True
-        st.session_state.test_done = False
         st.session_state.start_time = time.time()
+        st.session_state.phase = "show"
         st.session_state.recall_input = ""
 
-    # -------- Show / Hide Words --------
-    if st.session_state.showing_words:
+    # -------- SHOW WORDS --------
+    if st.session_state.phase == "show":
         elapsed = time.time() - st.session_state.start_time
 
         if elapsed < 6:
             placeholder.markdown(
-                f"### {' • '.join(st.session_state.words)}"
+                f"## {' • '.join(st.session_state.words)}"
             )
-            st.experimental_rerun()
+            st_autorefresh(interval=200, limit=30, key="refresh_words")
         else:
             placeholder.empty()
-            st.session_state.showing_words = False
-            st.session_state.test_done = True
+            st.session_state.phase = "recall"
 
-    # -------- Recall Phase --------
+    # -------- RECALL --------
     got = 0
-    if st.session_state.test_done:
+    if st.session_state.phase == "recall":
         recall = st.text_input(
             "✍️ Type the words you remember (comma separated)",
             key="recall_input"
         )
 
         if recall:
-            recalled_words = [w.strip().lower() for w in recall.split(",")]
-            got = sum(
-                1 for w in st.session_state.words if w in recalled_words
-            )
+            recalled = [w.strip().lower() for w in recall.split(",")]
+            got = sum(1 for w in st.session_state.words if w in recalled)
 
         st.write(f"✅ Recalled: **{got} / {len(st.session_state.words)}**")
 
     return got
+
 
 
 def verbal_fluency():
