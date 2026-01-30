@@ -107,10 +107,10 @@ st.markdown("---")
 #    label="Open Dashboard")
 
 #with c3:
-    st.markdown("### 🤖 AI Predictions")
-    st.write("Use AI models to analyze text and emotional patterns.")
-    st.page_link("pages/3_🧠_Model_Predictions.py", 
-    label="AI Predictions")
+  #  st.markdown("### 🤖 AI Predictions")
+  #  st.write("Use AI models to analyze text and emotional patterns.")
+  #  st.page_link("pages/3_🧠_Model_Predictions.py", 
+  #  label="AI Predictions")
 
 #st.markdown("---")
 #'''
