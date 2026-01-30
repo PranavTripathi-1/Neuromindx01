@@ -9,3 +9,4 @@ sentence-transformers
 transformers
 tokenizers
 reportlab
+streamlit-autorefresh
