@@ -89,31 +89,31 @@ else:
 st.markdown("---")
 
 # ---------------------- QUICK START CARDS ----------------------
-'''
-st.subheader("🚀 Get Started Quickly")
+#'''
+#st.subheader("🚀 Get Started Quickly")
 
-c1, c2, c3 = st.columns(3)
+#c1, c2, c3 = st.columns(3)
 
-with c1:
-    st.markdown("### 🧠 Assess Yourself")
-    st.write("Run the interactive **Neuropsy Assessment** to screen for early symptoms.")
-    st.page_link("pages/1_🧩_Assessments.py", 
-    label="Start Assessment")
+#with c1:
+ #   st.markdown("### 🧠 Assess Yourself")
+  #  st.write("Run the interactive **Neuropsy Assessment** to screen for early symptoms.")
+   # st.page_link("pages/1_🧩_Assessments.py", 
+    #label="Start Assessment")
 
-with c2:
-    st.markdown("### 📊 View Insights")
-    st.write("See your data visualized beautifully in the **Dashboard**.")
-    st.page_link("pages/2_📊_Dashboard.py", 
-    label="Open Dashboard")
+#with c2:
+#    st.markdown("### 📊 View Insights")
+#    st.write("See your data visualized beautifully in the **Dashboard**.")
+#    st.page_link("pages/2_📊_Dashboard.py", 
+#    label="Open Dashboard")
 
-with c3:
+#with c3:
     st.markdown("### 🤖 AI Predictions")
     st.write("Use AI models to analyze text and emotional patterns.")
     st.page_link("pages/3_🧠_Model_Predictions.py", 
     label="AI Predictions")
 
-st.markdown("---")
-'''
+#st.markdown("---")
+#'''
 # ---------------------- FOOTER ----------------------
 st.markdown("""
 <div style='text-align:center; color:gray; margin-top:40px;'>

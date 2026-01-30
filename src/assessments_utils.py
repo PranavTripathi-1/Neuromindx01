@@ -116,21 +116,49 @@ def pqb():
 
 # ---------- Short cognition + motor tasks ----------
 def memory_recall():
-    """Simple immediate recall: show 5 words briefly then ask to recall."""
-    st.subheader("Memory — Immediate recall")
-    words = ["apple","penny","river","window","tiger"]
-    st.write("You will see a list of 5 simple words for 6 seconds. Try to remember as many as you can.")
+    import time
+    import streamlit as st
+
+    st.subheader("🧠 Memory — Immediate Recall")
+
+    words = ["apple", "penny", "river", "window", "tiger"]
+
+    if "showing_words" not in st.session_state:
+        st.session_state.showing_words = False
+
+    if "start_time" not in st.session_state:
+        st.session_state.start_time = None
+
+    placeholder = st.empty()
+
     if st.button("Show words (6s)", key="show_words"):
-        st.write(" • ".join(words))
-        time.sleep(6)
-        st.write(" " * 50)  # clear-ish
-    recall = st.text_input("Type the words you remember (separate by commas)", key="recall_input")
-    # simple scoring: count matched words
+        st.session_state.showing_words = True
+        st.session_state.start_time = time.time()
+
+    # show words for 6 seconds
+    if st.session_state.showing_words:
+        elapsed = time.time() - st.session_state.start_time
+
+        if elapsed < 6:
+            placeholder.markdown(" • ".join(words))
+            st.experimental_rerun()
+        else:
+            placeholder.empty()
+            st.session_state.showing_words = False
+
+    recall = st.text_input(
+        "Type the words you remember (separate by commas)",
+        key="recall_input"
+    )
+
     got = 0
     if recall:
-        got = sum(1 for w in words if w.lower() in recall.lower())
-    st.write(f"Recalled: {got} / {len(words)}")
+        got = sum(1 for w in words if w in recall.lower())
+
+    st.write(f"Recalled: **{got} / {len(words)}**")
+
     return got
+
 
 def verbal_fluency():
     """Name as many animals in 60 seconds — count approximate by user input split."""
