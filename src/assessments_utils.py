@@ -117,11 +117,20 @@ def pqb():
 # ---------- Short cognition + motor tasks ----------
 def memory_recall():
     import time
+    import random
     import streamlit as st
 
     st.subheader("🧠 Memory — Immediate Recall")
 
-    words = ["apple", "penny", "river", "window", "tiger"]
+    WORD_POOL = [
+        "apple", "penny", "river", "window", "tiger",
+        "cloud", "chair", "bread", "mirror", "garden",
+        "train", "stone", "flower", "coffee", "planet"
+    ]
+
+    # -------- Session State Init --------
+    if "words" not in st.session_state:
+        st.session_state.words = []
 
     if "showing_words" not in st.session_state:
         st.session_state.showing_words = False
@@ -129,33 +138,48 @@ def memory_recall():
     if "start_time" not in st.session_state:
         st.session_state.start_time = None
 
+    if "test_done" not in st.session_state:
+        st.session_state.test_done = False
+
     placeholder = st.empty()
 
-    if st.button("Show words (6s)", key="show_words"):
+    # -------- Start Test --------
+    if st.button("👀 Show words (6s)"):
+        st.session_state.words = random.sample(WORD_POOL, 5)
         st.session_state.showing_words = True
+        st.session_state.test_done = False
         st.session_state.start_time = time.time()
+        st.session_state.recall_input = ""
 
-    # show words for 6 seconds
+    # -------- Show / Hide Words --------
     if st.session_state.showing_words:
         elapsed = time.time() - st.session_state.start_time
 
         if elapsed < 6:
-            placeholder.markdown(" • ".join(words))
+            placeholder.markdown(
+                f"### {' • '.join(st.session_state.words)}"
+            )
             st.experimental_rerun()
         else:
             placeholder.empty()
             st.session_state.showing_words = False
+            st.session_state.test_done = True
 
-    recall = st.text_input(
-        "Type the words you remember (separate by commas)",
-        key="recall_input"
-    )
-
+    # -------- Recall Phase --------
     got = 0
-    if recall:
-        got = sum(1 for w in words if w in recall.lower())
+    if st.session_state.test_done:
+        recall = st.text_input(
+            "✍️ Type the words you remember (comma separated)",
+            key="recall_input"
+        )
 
-    st.write(f"Recalled: **{got} / {len(words)}**")
+        if recall:
+            recalled_words = [w.strip().lower() for w in recall.split(",")]
+            got = sum(
+                1 for w in st.session_state.words if w in recalled_words
+            )
+
+        st.write(f"✅ Recalled: **{got} / {len(st.session_state.words)}**")
 
     return got
 
