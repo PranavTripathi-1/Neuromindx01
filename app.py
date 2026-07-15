@@ -17,7 +17,7 @@ if os.path.exists(logo_path):
     st.sidebar.image(logo, width=180)
 
 st.sidebar.markdown("""
-## 🧠 Neuropsy Early Screening
+## 🧠 Neuro Mind-X Early Screening
 Your personal tool for early detection of  
 **neuropsychiatric symptoms**,  
 cognitive changes, and subtle early-stage  
@@ -41,11 +41,11 @@ st.sidebar.markdown("---")
 st.sidebar.info("🔬 *Early screening only — not a diagnosis*")
 
 # ---------------------- MAIN CONTENT ----------------------
-st.title("🧠 Neuropsy Early Screening System")
+st.title("🧠 Neuro Mind-X Early Screening System")
 st.subheader("Early Detection • Mental Health • Cognitive Patterns")
 
 st.write("""
-Welcome to the **Neuropsy Early Screening System** —  
+Welcome to the **Neuro Mind-X  Early Screening System** —  
 an intelligent platform designed to detect **early signals**,  
 patterns, and subtle markers of:
 
